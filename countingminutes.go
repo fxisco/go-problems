@@ -18,7 +18,7 @@ import (
 	"strings"
 )
 
-type Time struct {
+type time struct {
 	Minutes  int
 	Hours    int
 	Meridien string
@@ -30,7 +30,7 @@ func CountingMinutes(str string) string {
 	return str
 }
 
-func parseTime(str string) Time {
+func parseTime(str string) time {
 	isAm := strings.Contains(str, "am")
 	meridien := "am"
 	hours, _ := strconv.Atoi(str[0:2])
@@ -40,25 +40,50 @@ func parseTime(str string) Time {
 		meridien = "pm"
 	}
 
-	fmt.Println(hours)
-	fmt.Println(minutes)
-
-	return Time{
+	return time{
 		Minutes:  minutes,
 		Hours:    hours,
 		Meridien: meridien,
 	}
 }
 
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
 func main() {
-	str := "12:30pm-12:00am"
+	str := "02:30am-02:40am"
 	hours := strings.Split(str, "-")
 	firstHour := parseTime(hours[0])
 	secondHour := parseTime(hours[1])
+	const HourInMinutes int = 60
+	const DayInMinutes int = 24 * HourInMinutes
 	var totalMinutes int
 
 	if firstHour.Meridien == secondHour.Meridien {
+		if firstHour.Hours < secondHour.Hours {
+			totalMinutes += (secondHour.Hours - firstHour.Hours) * HourInMinutes
+
+			if firstHour.Minutes < secondHour.Minutes {
+				totalMinutes += abs(firstHour.Minutes - secondHour.Minutes)
+			} else if firstHour.Minutes > secondHour.Minutes {
+				totalMinutes += (secondHour.Minutes - firstHour.Minutes)
+			}
+		} else if firstHour.Hours == secondHour.Hours {
+			if firstHour.Minutes < secondHour.Minutes {
+				totalMinutes += abs(firstHour.Minutes - secondHour.Minutes)
+			} else if firstHour.Minutes > secondHour.Minutes {
+				fmt.Println((secondHour.Minutes - firstHour.Minutes))
+				totalMinutes += (DayInMinutes + (secondHour.Minutes - firstHour.Minutes))
+			}
+		} else {
+			totalMinutes += DayInMinutes + (firstHour.Hours - secondHour.Hours)
+		}
 
 	}
+
 	fmt.Println(totalMinutes)
 }
