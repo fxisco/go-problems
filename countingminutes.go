@@ -22,12 +22,34 @@ type time struct {
 	Minutes  int
 	Hours    int
 	Meridien string
+	Value    int
 }
 
-func CountingMinutes(str string) string {
+const minutesInHour int = 60
+const halfDayInHours int = 12
+const halfDayInMinutes int = 12 * minutesInHour
+const dayInMinutes int = 24 * minutesInHour
 
-	// code goes here
-	return str
+func CountingMinutes(str string) string {
+	hours := strings.Split(str, "-")
+	firstHour := parseTime(hours[0])
+	secondHour := parseTime(hours[1])
+	var totalMinutes int
+
+	if (firstHour.Value > halfDayInMinutes && secondHour.Value > halfDayInMinutes) ||
+		(firstHour.Value < halfDayInMinutes && secondHour.Value < halfDayInMinutes) {
+		if firstHour.Value > secondHour.Value {
+			totalMinutes += (dayInMinutes) - (firstHour.Value - secondHour.Value)
+		} else {
+			totalMinutes += secondHour.Value - firstHour.Value
+		}
+	} else {
+		totalMinutes += halfDayInMinutes
+		totalMinutes += abs(firstHour.Value - (secondHour.Value + halfDayInMinutes))
+	}
+	text := strconv.Itoa(totalMinutes)
+
+	return text
 }
 
 func parseTime(str string) time {
@@ -35,15 +57,24 @@ func parseTime(str string) time {
 	meridien := "am"
 	hours, _ := strconv.Atoi(str[0:2])
 	minutes, _ := strconv.Atoi(str[3:5])
+	var value int
 
 	if !isAm {
 		meridien = "pm"
+	}
+
+	if meridien == "am" {
+		value += minutesInHour * hours
+		value += minutes
+	} else {
+		value += minutesInHour*(hours+halfDayInHours) + minutes
 	}
 
 	return time{
 		Minutes:  minutes,
 		Hours:    hours,
 		Meridien: meridien,
+		Value:    value,
 	}
 }
 
@@ -55,35 +86,27 @@ func abs(x int) int {
 }
 
 func main() {
-	str := "02:30am-02:40am"
-	hours := strings.Split(str, "-")
-	firstHour := parseTime(hours[0])
-	secondHour := parseTime(hours[1])
-	const HourInMinutes int = 60
-	const DayInMinutes int = 24 * HourInMinutes
-	var totalMinutes int
+	str := "2:03pm-1:39pm"
 
-	if firstHour.Meridien == secondHour.Meridien {
-		if firstHour.Hours < secondHour.Hours {
-			totalMinutes += (secondHour.Hours - firstHour.Hours) * HourInMinutes
-
-			if firstHour.Minutes < secondHour.Minutes {
-				totalMinutes += abs(firstHour.Minutes - secondHour.Minutes)
-			} else if firstHour.Minutes > secondHour.Minutes {
-				totalMinutes += (secondHour.Minutes - firstHour.Minutes)
-			}
-		} else if firstHour.Hours == secondHour.Hours {
-			if firstHour.Minutes < secondHour.Minutes {
-				totalMinutes += abs(firstHour.Minutes - secondHour.Minutes)
-			} else if firstHour.Minutes > secondHour.Minutes {
-				fmt.Println((secondHour.Minutes - firstHour.Minutes))
-				totalMinutes += (DayInMinutes + (secondHour.Minutes - firstHour.Minutes))
-			}
-		} else {
-			totalMinutes += DayInMinutes + (firstHour.Hours - secondHour.Hours)
-		}
-
-	}
-
-	fmt.Println(totalMinutes)
+	fmt.Println(CountingMinutes(str))
 }
+
+// 1. For input "12:30pm-12:00am" the output was incorrect. The correct output is 690
+
+// 2. For input "1:00pm-11:00am" the output was incorrect. The correct output is 1320
+
+// 3. For input "2:03pm-1:39pm" the output was incorrect. The correct output is 1416
+
+// 4. For input "1:23am-1:08am" the output was incorrect. The correct output is 1425
+
+// 5. For input "2:08pm-2:00am" the output was incorrect. The correct output is 712
+
+// 6. For input "2:00pm-3:00pm" the output was incorrect. The correct output is 60
+
+// 7. For input "11:00am-2:10pm" the output was incorrect. The correct output is 190
+
+// 8. For input "12:31pm-12:34pm" the output was incorrect. The correct output is 3
+
+// 9. For input "3:00pm-4:45am" the output was incorrect. The correct output is 825
+
+// 10. For input "5:00pm-5:11pm" the output was incorrect. The correct output is 11
