@@ -34,10 +34,6 @@ func CountingMinutes(str string) string {
 	hours := strings.Split(str, "-")
 	firstHour := parseTime(hours[0])
 	secondHour := parseTime(hours[1])
-
-	fmt.Println(firstHour)
-	fmt.Println(secondHour)
-
 	var totalMinutes int
 
 	if (firstHour.Value > halfDayInMinutes && secondHour.Value > halfDayInMinutes) ||
@@ -48,8 +44,12 @@ func CountingMinutes(str string) string {
 			totalMinutes += secondHour.Value - firstHour.Value
 		}
 	} else {
-		totalMinutes += halfDayInMinutes
-		totalMinutes += (secondHour.Value + halfDayInMinutes) - firstHour.Value
+		if firstHour.Value < secondHour.Value {
+			totalMinutes += secondHour.Value - firstHour.Value
+		} else {
+			totalMinutes += halfDayInMinutes
+			totalMinutes += (secondHour.Value + halfDayInMinutes) - firstHour.Value
+		}
 	}
 	text := strconv.Itoa(totalMinutes)
 
@@ -91,7 +91,7 @@ func abs(x int) int {
 }
 
 func main() {
-	str := "11:00am-2:10pm"
+	str := "3:00pm-4:45am"
 
 	fmt.Println(CountingMinutes(str))
 }
