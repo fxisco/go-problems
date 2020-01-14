@@ -49,7 +49,7 @@ func CountingMinutes(str string) string {
 		}
 	} else {
 		totalMinutes += halfDayInMinutes
-		totalMinutes += abs(firstHour.Value - (secondHour.Value + halfDayInMinutes))
+		totalMinutes += (secondHour.Value + halfDayInMinutes) - firstHour.Value
 	}
 	text := strconv.Itoa(totalMinutes)
 
@@ -91,7 +91,7 @@ func abs(x int) int {
 }
 
 func main() {
-	str := "12:30pm-12:00am"
+	str := "11:00am-2:10pm"
 
 	fmt.Println(CountingMinutes(str))
 }
@@ -107,7 +107,7 @@ func main() {
 // 5. For input "2:08pm-2:00am" the output was incorrect. The correct output is 712
 
 // 6. For input "2:00pm-3:00pm" the output was incorrect. The correct output is 60
-
+//
 // 7. For input "11:00am-2:10pm" the output was incorrect. The correct output is 190
 
 // 8. For input "12:31pm-12:34pm" the output was incorrect. The correct output is 3
