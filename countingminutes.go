@@ -61,7 +61,7 @@ func parseTime(str string) time {
 	index := strings.Index(str, ":")
 	meridien := "am"
 	hours, _ := strconv.Atoi(str[0:index])
-	minutes, _ := strconv.Atoi(str[index : index+3])
+	minutes, _ := strconv.Atoi(str[index+1 : index+3])
 	var value int
 
 	if !isAm {
